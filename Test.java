@@ -7,22 +7,21 @@ public class Test{
 
     public static void main(String[] params){
 
-        var productVolumes = new ArrayList<Integer>(Arrays.asList(1, 5, 10, 4, 3));
+        var productVolumes = new ArrayList<Integer>(Arrays.asList(1, 5, 5, 7, 15, 10, 6, 2, 15, 10, 4, 3, 2, 1));
         Collections.sort(productVolumes, Collections.reverseOrder());
         var boxesRepo = new ArrayList<Box>();
         boxesRepo.add(new Box(1, 2));
         boxesRepo.add(new Box(1, 3));
         boxesRepo.add(new Box(2, 5));
-        boxesRepo.add(new Box(1, 7));
+        boxesRepo.add(new Box(1, 11));
         boxesRepo.add(new Box(1, 15));
         
         var boxes = new ArrayList<Box>();
 
         for (Integer product : productVolumes) {
-            Box box;
 
             if (boxes.size() == 0) {
-                box = smallestNewPossibleBox(product, boxesRepo);
+                var box = smallestNewPossibleBox(product, boxesRepo);
                 if(box == null){
                     throw new IllegalStateException("Impossible solution");
                 }
@@ -31,13 +30,13 @@ public class Test{
 
             var index = productFitsAnyBox(product, boxes);
             if(index != -1){
-                box = boxes.get(index);
+                var box = boxes.get(index);
                 box.products.add(product);
                 boxes.set(index, box);
             }else{
                 index = 0;
                 var foundUpgrade = false;
-                box = null;
+                Box box = null;
                 do{
                     var currentBox = boxes.get(index);
                     box = fitUpgradedBox(product, currentBox, boxesRepo);
@@ -48,7 +47,7 @@ public class Test{
                         index++;
                     }
 
-                }while(index < boxes.size() && foundUpgrade);
+                }while(index < boxes.size() && !foundUpgrade);
 
                 if(box != null){
                     box.products.add(product);
@@ -61,7 +60,14 @@ public class Test{
             }
         }
 
-        boxes = boxes;
+        for(var box : boxes){
+            System.out.println(("Box: " + box.id + " Volume: "  + box.volume + " Remaining: " + box.remainingVolume()));
+            
+            for (var product : box.products) {
+                System.out.println(product);
+            }
+            System.out.println("------------------------------");
+        }
 
     }
 
@@ -70,7 +76,7 @@ public class Test{
 
         for (Box box : boxesRepo) {
             if(volumeToAdd <= box.volume){
-                return box;
+                return new Box(box.id, box.volume);
             }
         }
 
@@ -108,4 +114,5 @@ public class Test{
     public static boolean productsFitsExistingBox(Integer volumeToAdd, Box box) {
         return box.remainingVolume() >= volumeToAdd;
     }
+
 }
